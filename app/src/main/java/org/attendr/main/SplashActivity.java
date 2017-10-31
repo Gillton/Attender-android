@@ -1,7 +1,9 @@
-package org.attendr;
+package org.attendr.main;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import org.attendr.R;
 
 public class SplashActivity extends AppCompatActivity {
 
