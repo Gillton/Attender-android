@@ -10,49 +10,70 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.attendr.R;
+import org.attendr.classes.models.ClassDetails;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClassFragment extends Fragment {
 
-	private RecyclerView recyclerView;
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+        View rootView = inflater.inflate(R.layout.fragment_classes, container, false);
+        RecyclerView recyclerView = rootView.findViewById(R.id.recyclerView);
+        CardAdapter cardAdapter = new CardAdapter();
+        recyclerView.setAdapter(cardAdapter);
+        LinearLayoutManager manager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(manager);
 
-	@Nullable
-	@Override
-	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-		super.onCreateView(inflater, container, savedInstanceState);
-		View rootView = inflater.inflate(R.layout.fragment_classes, container, false);
-		recyclerView = rootView.findViewById(R.id.recyclerView);
-		CardAdapter cardAdapter = new CardAdapter();
-		recyclerView.setAdapter(cardAdapter);
-		LinearLayoutManager manager = new LinearLayoutManager(getContext());
-		recyclerView.setLayoutManager(manager);
+        return rootView;
+    }
 
-		return rootView;
-	}
+    class CardAdapter extends RecyclerView.Adapter<CardHolder> {
 
-	class CardAdapter extends RecyclerView.Adapter<CardHolder> {
+        List<ClassDetails> classes = new ArrayList<>();
 
+        void addClass(ClassDetails details) {
+            classes.add(details);
+            notifyItemInserted(classes.size() - 1);
+        }
 
+        void removeClass(ClassDetails details) {
+            int position = classes.indexOf(details);
+            if (position != -1) {
+                classes.remove(details);
+                notifyItemRemoved(position);
+            }
+        }
 
-		@Override
-		public CardHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-			return null;
-		}
+        @Override
+        public CardHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            return new CardHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.classes_card, parent, false));
+        }
 
-		@Override
-		public void onBindViewHolder(CardHolder holder, int position) {
+        @Override
+        public void onBindViewHolder(CardHolder holder, int position) {
+            if (!classes.isEmpty() && classes.size() > position) {
+                holder.setData(classes.get(position));
+            }
+        }
 
-		}
+        @Override
+        public int getItemCount() {
+            return classes.size();
+        }
+    }
 
-		@Override
-		public int getItemCount() {
-			return 0;
-		}
-	}
+    class CardHolder extends RecyclerView.ViewHolder {
 
-	class CardHolder extends RecyclerView.ViewHolder {
+        CardHolder(View itemView) {
+            super(itemView);
+        }
 
-		public CardHolder(View itemView) {
-			super(itemView);
-		}
-	}
+        void setData(ClassDetails details) {
+
+        }
+    }
 }
