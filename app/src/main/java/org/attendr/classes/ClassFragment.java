@@ -8,9 +8,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import org.attendr.R;
 import org.attendr.classes.models.ClassDetails;
+import org.attendr.helpers.views.PercentageCircle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,12 +73,18 @@ public class ClassFragment extends Fragment {
 
     class CardHolder extends RecyclerView.ViewHolder {
 
+        private PercentageCircle percentageWheel;
+        private TextView classTitle;
+
         CardHolder(View itemView) {
             super(itemView);
+            percentageWheel = itemView.findViewById(R.id.percentageWheel);
+            classTitle = itemView.findViewById(R.id.classTitle);
         }
 
         void setData(ClassDetails details) {
-
+            percentageWheel.setProgress(86);
+            classTitle.setText(details.getClassTitle());
         }
     }
 }

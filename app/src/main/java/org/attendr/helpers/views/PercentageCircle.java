@@ -2,6 +2,7 @@ package org.attendr.helpers.views;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
@@ -27,6 +28,8 @@ public class PercentageCircle extends View {
     private int angle = 1;
     private String text = "";
 
+    private int strokeWidth;
+
     public PercentageCircle(Context context) {
         super(context);
         init();
@@ -34,11 +37,17 @@ public class PercentageCircle extends View {
 
     public PercentageCircle(Context context, AttributeSet attrs) {
         super(context, attrs);
+        TypedArray attributes = context.getTheme().obtainStyledAttributes(attrs, R.styleable.PercentageCircle, 0, 0);
+        strokeWidth = attributes.getDimensionPixelSize(R.styleable.PercentageCircle_stroke, 3);
+        attributes.recycle();
         init();
     }
 
     public PercentageCircle(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        TypedArray attributes = context.getTheme().obtainStyledAttributes(attrs, R.styleable.PercentageCircle, 0, 0);
+        strokeWidth = attributes.getDimensionPixelSize(R.styleable.PercentageCircle_stroke, 3);
+        attributes.recycle();
         init();
     }
 
@@ -58,7 +67,7 @@ public class PercentageCircle extends View {
     }
 
     public void recalcSize() {
-        int strokeWidth = getHeight() / 15;
+        strokeWidth = getHeight() / 15;
         int diameter = Math.min(width, height);
         int top = strokeWidth / 2;
         int bottom = diameter - strokeWidth / 2;
@@ -103,12 +112,12 @@ public class PercentageCircle extends View {
         width = getMeasuredWidth();
         height = getMeasuredHeight();
         setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
-        recalcSize();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        recalcSize();
         paint.setColor(ContextCompat.getColor(getContext(), R.color.colorLightGray));
         canvas.drawArc(bounds, 0, 360, true, paint);
         paint.setColor(ContextCompat.getColor(getContext(), R.color.colorVividBlue));
