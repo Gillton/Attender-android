@@ -27,7 +27,10 @@ public class ClassFragment extends Fragment {
         recyclerView.setAdapter(cardAdapter);
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(manager);
-
+        ClassDetails details = new ClassDetails();
+        details.setProfessor("Silvia Bompadre");
+        details.setClassTitle("University Physics 1");
+        cardAdapter.addClass(details);
         return rootView;
     }
 
