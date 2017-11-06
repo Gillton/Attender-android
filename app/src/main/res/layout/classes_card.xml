@@ -16,7 +16,11 @@
         android:id="@+id/classTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Test"
+        android:layout_toRightOf="@+id/percentageWheel"
+        android:layout_toEndOf="@+id/percentageWheel"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
         android:textSize="20sp"
         />
 </RelativeLayout>

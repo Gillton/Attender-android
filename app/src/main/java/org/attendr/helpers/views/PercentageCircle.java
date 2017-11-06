@@ -18,8 +18,11 @@ public class PercentageCircle extends View {
 
     private ValueAnimator animator;
     private Paint paint;
+    private Paint paintGray;
+    private Paint paintText;
     private Paint centerPaint;
     private RectF bounds;
+    private RectF boundsGray;
     private RectF centerBounds;
 
     private int width;
@@ -53,30 +56,38 @@ public class PercentageCircle extends View {
 
     private void init() {
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setStyle(Paint.Style.STROKE);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(ContextCompat.getColor(getContext(), R.color.colorVividBlue));
+
+        paintGray = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setStyle(Paint.Style.FILL);
+        paintGray.setColor(ContextCompat.getColor(getContext(), R.color.colorLightGray));
+
         centerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         centerPaint.setStyle(Paint.Style.FILL);
         centerPaint.setColor(ContextCompat.getColor(getContext(), android.R.color.white));
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                setProgress(55);
-            }
-        }, 100);
+
+        paintText = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paintText.setStyle(Paint.Style.FILL);
+        paintText.setColor(ContextCompat.getColor(getContext(), R.color.colorVividBlue));
+
+        recalcSize();
     }
 
     public void recalcSize() {
-        strokeWidth = getHeight() / 15;
-        int diameter = Math.min(width, height);
+        int heightOrWidth = Math.min(width, height);
+        strokeWidth = heightOrWidth / 15;
+        int diameter = heightOrWidth;
         int top = strokeWidth / 2;
         int bottom = diameter - strokeWidth / 2;
         paint.setStrokeWidth(strokeWidth);
         bounds = new RectF(top, top, bottom, bottom);
+        boundsGray = new RectF(top, top, bottom, bottom);
         int newTop = top + strokeWidth;
         int newBottom = bottom - strokeWidth;
         centerBounds = new RectF(newTop, newTop, newBottom, newBottom);
-        paint.setTextSize(getHeight() / 4);
+        paintText.setTextSize(heightOrWidth / 4);
+        invalidate();
     }
 
     public int getProgress() {
@@ -112,20 +123,19 @@ public class PercentageCircle extends View {
         width = getMeasuredWidth();
         height = getMeasuredHeight();
         setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
+        recalcSize();
+        invalidate();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        recalcSize();
-        paint.setColor(ContextCompat.getColor(getContext(), R.color.colorLightGray));
-        canvas.drawArc(bounds, 0, 360, true, paint);
-        paint.setColor(ContextCompat.getColor(getContext(), R.color.colorVividBlue));
+
+        canvas.drawArc(boundsGray, 0, 360, true, paintGray);
         canvas.drawArc(bounds, -91, angle, true, paint);
-        paint.setStyle(Paint.Style.FILL);
         canvas.drawArc(centerBounds, 0, 360, true, centerPaint);
         int xPos = (canvas.getWidth() / 2);
-        int yPos = xPos - (int) ((paint.descent() + paint.ascent()) / 2);
-        canvas.drawText(text, xPos - (int) paint.measureText(text) / 2, yPos, paint);
+        int yPos = xPos - (int) ((paintText.descent() + paintText.ascent()) / 2);
+        canvas.drawText(text, xPos - (int) paintText.measureText(text) / 2, yPos, paintText);
     }
 }
