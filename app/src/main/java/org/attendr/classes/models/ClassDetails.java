@@ -10,6 +10,7 @@ public class ClassDetails extends RealmObject {
 
 	private String classTitle;
 	private String professor;
+	private int percentage;
 
 	public ClassDetails() {
 
@@ -37,5 +38,13 @@ public class ClassDetails extends RealmObject {
 
     public void setProfessor(String professor) {
         this.professor = professor;
+    }
+
+    public int getPercentage() {
+        return percentage;
+    }
+
+    public void setPercentage(int percentage) {
+        this.percentage = percentage;
     }
 }

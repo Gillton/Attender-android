@@ -6,7 +6,6 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
@@ -75,11 +74,10 @@ public class PercentageCircle extends View {
     }
 
     public void recalcSize() {
-        int heightOrWidth = Math.min(width, height);
+        int heightOrWidth = Math.min(width, height); //ALSO diameter
         strokeWidth = heightOrWidth / 15;
-        int diameter = heightOrWidth;
         int top = strokeWidth / 2;
-        int bottom = diameter - strokeWidth / 2;
+        int bottom = heightOrWidth - strokeWidth / 2;
         paint.setStrokeWidth(strokeWidth);
         bounds = new RectF(top, top, bottom, bottom);
         boundsGray = new RectF(top, top, bottom, bottom);
