@@ -27,7 +27,7 @@ class PercentageCircle(context: Context, attrs: AttributeSet? = null, defStyleAt
     private var boundsGray: RectF? = null
     private var centerBounds: RectF? = null
 
-    private var progress = 1
+    var progress = 1
         set(value) {
             val angle = (360 * (value / 100.0f)).toInt()
             if (value in 0..100) {
