@@ -6,7 +6,7 @@ import io.realm.annotations.PrimaryKey
 /**
  * @author Pauldg7@gmail.com (Paul Gillis)
  */
-class ClassDetails : RealmObject() {
+open class ClassDetails : RealmObject() {
 
     @PrimaryKey
     var id = -1
