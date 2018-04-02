@@ -1,4 +1,4 @@
-package org.attendr.helpers.views
+package org.attendr.utils.views
 
 import android.animation.ValueAnimator
 import android.content.Context
