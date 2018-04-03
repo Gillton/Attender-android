@@ -2,8 +2,8 @@ package org.attendr.qrscanner
 
 import android.Manifest
 import android.app.Activity
-import android.view.View
 import android.app.Fragment
+import android.view.View
 import android.content.pm.PackageManager
 import android.support.v4.app.ActivityCompat
 import android.os.Looper
@@ -23,11 +23,9 @@ import org.attendr.utils.network.Promise
  */
 class QrCaptureFragment : Fragment() {
 
-    private var promise: Promise<Barcode>? = null
-
     companion object {
 
-        private const val TAG = "Barcode-reader"
+        const val TAG = "Barcode-reader"
 
         private const val CAMERA_PERMISSION = 2
 
@@ -39,23 +37,20 @@ class QrCaptureFragment : Fragment() {
     /**
      * Initializes the UI and creates the detector pipeline.
      */
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle?): View {
         super.onCreateView(inflater, container, savedInstanceState)
-        val rootView = inflater.inflate(R.layout.fragment_qrcode_capture, container, false)
-        checkForPermission(activity)
-        return rootView
+        return inflater.inflate(R.layout.fragment_qrcode_capture, container, false)
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        promise = Promise()
-        promise?.then {
+        checkForPermission(activity)
+        preview?.promise = Promise<Barcode>().then {
             val url = it.displayValue
             if (url.contains("/h")) {
                 onDetectedQrCode(url)
             }
         }
-        preview?.promise = promise
     }
 
     private fun onDetectedQrCode(url: String) {

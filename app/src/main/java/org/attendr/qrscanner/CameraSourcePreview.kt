@@ -1,9 +1,7 @@
 package org.attendr.qrscanner
 
-import android.Manifest
 import android.view.SurfaceHolder
 import android.content.Context
-import android.support.annotation.RequiresPermission
 import android.util.AttributeSet
 import android.util.Log
 import com.google.android.gms.vision.CameraSource
@@ -13,7 +11,6 @@ import com.google.android.gms.vision.Tracker
 import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
 import org.attendr.utils.network.Promise
-import java.io.IOException
 
 
 /**
@@ -21,8 +18,10 @@ import java.io.IOException
  */
 
 class CameraSourcePreview @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defAttrStyle: Int = 0) : SurfaceView(context, attrs, defAttrStyle) {
-    private var mSurfaceAvailable: Boolean = false
-    private var mCameraSource: CameraSource? = null
+    private var surfaceAvailable = false
+    private var isRunning = false
+    private var cameraSource: CameraSource? = null
+
     var promise: Promise<Barcode>? = null
 
     companion object {
@@ -30,9 +29,8 @@ class CameraSourcePreview @JvmOverloads constructor(context: Context, attrs: Att
     }
 
     init {
-        mSurfaceAvailable = false
-
         holder.addCallback(SurfaceCallback())
+        requestLayout()
     }
 
     fun create() {
@@ -55,73 +53,47 @@ class CameraSourcePreview @JvmOverloads constructor(context: Context, attrs: Att
         barcodeDetector.setProcessor(multiProcessor)
 
         if (barcodeDetector.isOperational && width != 0 && height != 0) {
-            mCameraSource = CameraSource.Builder(context, barcodeDetector)
+            cameraSource = CameraSource.Builder(context, barcodeDetector)
                     .setFacing(CameraSource.CAMERA_FACING_BACK)
                     .setRequestedPreviewSize(width, height)
                     .setRequestedFps(24.0f)
                     .setAutoFocusEnabled(true)
                     .build()
+            start()
         } else {
             Log.w(TAG, "Error: Barcode Detector isn't operational")
         }
     }
 
-    @RequiresPermission(Manifest.permission.CAMERA)
-    fun start(cameraSource: CameraSource?) {
-        if (cameraSource == null) {
-            stop()
-        }
-
-        mCameraSource = cameraSource
-        mCameraSource?.let {
-            try {
-                startIfReady()
-            } catch (e: SecurityException) {
-                Log.e(TAG, "Unable to start camera source.", e)
-                release()
+    fun start() {
+        cameraSource?.let {
+            if (surfaceAvailable) {
+                try {
+                    cameraSource?.start(holder)
+                    isRunning = true
+                } catch (e: SecurityException) {
+                    Log.e(TAG, "You do not have permission to start the camera", e)
+                    release()
+                }
             }
         }
     }
 
     fun stop() {
-        mCameraSource?.stop()
+        isRunning = false
+        cameraSource?.stop()
     }
 
     fun release() {
-        mCameraSource?.release()
-        mCameraSource = null
-    }
-
-    @RequiresPermission(Manifest.permission.CAMERA)
-    @Throws(IOException::class, SecurityException::class)
-    private fun startIfReady() {
-        if (mSurfaceAvailable) {
-            mCameraSource?.start(holder)
+        if (isRunning) {
+            stop()
         }
-    }
-
-    private inner class SurfaceCallback : SurfaceHolder.Callback {
-        override fun surfaceCreated(surface: SurfaceHolder) {
-            mSurfaceAvailable = true
-            try {
-                startIfReady()
-            } catch (se: SecurityException) {
-                Log.e(TAG, "Do not have permission to start the camera", se)
-            } catch (e: IOException) {
-                Log.e(TAG, "Could not start camera source.", e)
-            }
-
-        }
-
-        override fun surfaceDestroyed(surface: SurfaceHolder) {
-            mSurfaceAvailable = false
-        }
-
-        override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {}
+        cameraSource?.release()
+        cameraSource = null
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        val size = mCameraSource?.previewSize
+        val size = cameraSource?.previewSize
         val previewWidth = size?.width ?: right - left
         val previewHeight = size?.height ?: bottom - top
 
@@ -129,13 +101,19 @@ class CameraSourcePreview @JvmOverloads constructor(context: Context, attrs: Att
 
         create()
 
-        try {
-            startIfReady()
-        } catch (e: IOException) {
-            Log.e(TAG, "Could not start camera source.", e)
-        } catch (se: SecurityException) {
-            Log.e(TAG, "Does not have permission to start the camera.", se)
+        start()
+    }
+
+    private inner class SurfaceCallback : SurfaceHolder.Callback {
+        override fun surfaceCreated(surface: SurfaceHolder) {
+            surfaceAvailable = true
+            start()
         }
 
+        override fun surfaceDestroyed(surface: SurfaceHolder) {
+            surfaceAvailable = false
+        }
+
+        override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {}
     }
 }
